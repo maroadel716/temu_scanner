@@ -5,12 +5,21 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
-      - run: flutter pub get
-      - run: flutter build ios --no-codesign
-      - uses: actions/upload-artifact@v4
+          channel: 'stable'
+      - name: Install
+        run: |
+          flutter pub get
+          cd ios
+          pod install || true
+          cd..
+      - name: Build iOS no sign
+        run: flutter build ios --release --no-codesign
+      - name: Upload
+        uses: actions/upload-artifact@v4
         with:
           name: Timo-iPhone-App
-          path: build/ios/iphoneos/
+          path: build/ios/iphoneos/Runner.app
